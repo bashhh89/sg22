@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 243, 244, 246;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+/* Custom styles for PDF components */
+.report-card {
+  @apply bg-white rounded-lg shadow-md p-6 mb-4;
+}
+
+.qa-section {
+  @apply mt-8;
+}
+
+.qa-item {
+  @apply mb-4 p-4 bg-gray-50 rounded-md;
+}
+
+.qa-reasoning {
+  @apply mt-2 text-sm text-gray-600 italic pl-4 border-l-4 border-blue-400;
+} 

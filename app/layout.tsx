@@ -1,9 +1,12 @@
+'use client';
+
 import React from 'react';
-import type { Metadata } from 'next';
+import '../styles/globals.css'; // Ensure this file exists
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Scorecard',
-  description: 'Generate PDF scorecards for AI assessments',
+  title: 'AI Scorecard - PDF Report Generation',
+  description: 'Professional PDF scorecards for AI efficiency assessments',
 };
 
 export default function RootLayout({
@@ -13,7 +16,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body className="bg-gray-50">
+        <nav className="bg-gray-900 text-white p-4">
+          <div className="container mx-auto flex justify-between items-center">
+            <div className="text-xl font-bold">AI Scorecard</div>
+            <div>
+              {/* Navigation links here if needed */}
+            </div>
+          </div>
+        </nav>
+        <main>{children}</main>
+      </body>
     </html>
   );
 } 
