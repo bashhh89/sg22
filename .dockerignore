@@ -1,31 +1,31 @@
-# Node modules
-node_modules
+# Only ignore specific directories/files
+# DO NOT ignore app directory or any Next.js source files
 
-# .git directory
-.git
+# Node modules
+node_modules/
+
+# Git
+.git/
+
+# Next.js build output (will be regenerated)
+.next/
 
 # Logs
-logs
+logs/
 
-# Environment variables (but keep any .env.example files)
+# Environment variables
 .env
 .env.*
 !.env.example
 
-# Editor files
-.vscode
-.idea
+# Editor configs
+.vscode/
+.idea/
 
-# Other unnecessary files
-LICENSE
-.DS_Store
+# Docker files (not needed inside the container)
+Dockerfile
+docker-compose.yml
+.dockerignore
 
-# Make sure we don't exclude important directories by accident
-!app/
-!components/
-!public/
-!styles/
-!next.config.js
-!tsconfig.json
-!postcss.config.js
-!tailwind.config.js 
+# Misc
+.DS_Store 
