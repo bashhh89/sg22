@@ -2,29 +2,89 @@
 
 This application generates PDF scorecards for AI assessments. This version is containerized with Docker for easy deployment.
 
-## Quick Start with Docker
+## Quick Start Deployment Instructions
 
-### Windows:
-1. Ensure Docker Desktop is installed and running
-2. Open PowerShell in this directory
-3. Run the setup script:
-```powershell
-.\docker-setup.ps1
+### Prerequisites:
+- Docker and Docker Compose installed
+- Port 3006 available on your server
+- Firewall allowing traffic on port 3006 (if accessing remotely)
+
+### Deployment Steps (Linux/Ubuntu):
+
+1. Clone this repository:
+```bash
+git clone https://github.com/bashhh89/sg22.git -b docker
+cd sg22
 ```
 
-### Linux/Mac:
-1. Ensure Docker and Docker Compose are installed and running
-2. Open Terminal in this directory
-3. Make the setup script executable:
+2. Make the setup script executable:
 ```bash
 chmod +x docker-setup.sh
 ```
-4. Run the setup script:
+
+3. Run the setup script:
 ```bash
 ./docker-setup.sh
 ```
 
-That's it! The application will be running at http://localhost:3006
+4. Access the application:
+   - Local: http://localhost:3006
+   - Server IP: http://YOUR_SERVER_IP:3006
+
+### Deployment Steps (Windows):
+
+1. Clone this repository:
+```powershell
+git clone https://github.com/bashhh89/sg22.git -b docker
+cd sg22
+```
+
+2. Run the setup script:
+```powershell
+.\docker-setup.ps1
+```
+
+3. Access the application:
+   - Local: http://localhost:3006
+   - Server IP: http://YOUR_SERVER_IP:3006
+
+## Firewall Configuration
+
+### Ubuntu/Debian:
+If you cannot access the application remotely, ensure port 3006 is open in your firewall:
+```bash
+sudo ufw allow 3006/tcp
+sudo ufw status
+```
+
+### Windows:
+If you cannot access the application remotely, ensure port 3006 is allowed in Windows Firewall.
+
+## Useful Docker Commands
+
+- View application logs:
+```bash
+docker-compose logs -f
+```
+
+- Stop the application:
+```bash
+docker-compose down
+```
+
+- Restart the application:
+```bash
+docker-compose restart
+```
+
+## Troubleshooting
+
+If the application doesn't start properly:
+
+1. Check if Docker is running
+2. Verify port 3006 is not in use by another application
+3. Check container logs: `docker-compose logs`
+4. Ensure your firewall allows traffic on port 3006
 
 ## Manual Docker Setup
 

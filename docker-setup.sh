@@ -1,70 +1,158 @@
 #!/bin/bash
 
-# Docker Setup Script for AI Scorecard (Linux/Mac)
+# Docker Setup Script for AI Scorecard (Linux)
 # This script will set up and run the AI Scorecard application using Docker
 
-echo -e "\e[36mAI Scorecard - Docker Setup Script\e[0m"
-echo -e "\e[36m=================================\e[0m"
+# Text formatting
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+echo -e "${CYAN}AI Scorecard - Docker Setup Script${NC}"
+echo -e "${CYAN}=================================${NC}"
 echo ""
 
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to check if a port is in use
+port_in_use() {
+    if command_exists lsof; then
+        lsof -i:"$1" >/dev/null 2>&1
+        return $?
+    elif command_exists netstat; then
+        netstat -tuln | grep ":$1 " >/dev/null 2>&1
+        return $?
+    else
+        echo -e "${YELLOW}Warning: Cannot check if port $1 is in use (lsof/netstat not available)${NC}"
+        return 1
+    fi
+}
+
 # Check if Docker is installed
-if command -v docker &> /dev/null; then
+if command_exists docker; then
     DOCKER_VERSION=$(docker --version)
-    echo -e "\e[32m✓ $DOCKER_VERSION is installed\e[0m"
+    echo -e "${GREEN}✓ $DOCKER_VERSION is installed${NC}"
 else
-    echo -e "\e[31m✗ Docker is not installed. Please install Docker from https://docs.docker.com/get-docker/\e[0m"
+    echo -e "${RED}✗ Docker is not installed. Please install Docker from https://docs.docker.com/get-docker/${NC}"
     exit 1
 fi
 
 # Check if Docker Compose is installed
-if command -v docker-compose &> /dev/null; then
+if command_exists docker-compose; then
     COMPOSE_VERSION=$(docker-compose --version)
-    echo -e "\e[32m✓ Docker Compose is installed\e[0m"
+    echo -e "${GREEN}✓ Docker Compose is installed${NC}"
+elif docker compose version >/dev/null 2>&1; then
+    echo -e "${GREEN}✓ Docker Compose plugin is installed${NC}"
+    # Create an alias for compatibility
+    alias docker-compose="docker compose"
 else
-    echo -e "\e[31m✗ Docker Compose is not installed. Please install it from https://docs.docker.com/compose/install/\e[0m"
+    echo -e "${RED}✗ Docker Compose is not installed. Please install it from https://docs.docker.com/compose/install/${NC}"
     exit 1
 fi
 
 # Check if Docker is running
-if docker info &> /dev/null; then
-    echo -e "\e[32m✓ Docker is running\e[0m"
+if docker info >/dev/null 2>&1; then
+    echo -e "${GREEN}✓ Docker is running${NC}"
 else
-    echo -e "\e[31m✗ Docker is not running. Please start the Docker service.\e[0m"
+    echo -e "${RED}✗ Docker is not running. Please start the Docker service.${NC}"
     exit 1
+fi
+
+# Check if port 3006 is in use
+if port_in_use 3006; then
+    echo -e "${RED}✗ Port 3006 is already in use. Please free up this port before continuing.${NC}"
+    exit 1
+else
+    echo -e "${GREEN}✓ Port 3006 is available${NC}"
 fi
 
 # Create logs directory if it doesn't exist
 if [ ! -d "logs" ]; then
-    echo -e "\e[33mCreating logs directory...\e[0m"
+    echo -e "${YELLOW}Creating logs directory...${NC}"
     mkdir -p logs
-    echo -e "\e[32m✓ Logs directory created\e[0m"
+    echo -e "${GREEN}✓ Logs directory created${NC}"
 fi
 
-# Step 1: Build and start the Docker container
-echo -e "\e[33mStep 1: Building and starting the Docker container...\e[0m"
+# Step 1: Stop any existing containers with the same name
+echo -e "${YELLOW}Step 1: Cleaning up any existing containers...${NC}"
+docker-compose down >/dev/null 2>&1
+echo -e "${GREEN}✓ Cleanup completed${NC}"
+
+# Step 2: Build and start the Docker container
+echo -e "${YELLOW}Step 2: Building and starting the Docker container...${NC}"
 if docker-compose up -d --build; then
-    echo -e "\e[32m✓ Docker container built and started successfully\e[0m"
+    echo -e "${GREEN}✓ Docker container built and started successfully${NC}"
 else
-    echo -e "\e[31m✗ Failed to build and start Docker container\e[0m"
+    echo -e "${RED}✗ Failed to build and start Docker container${NC}"
+    echo -e "${YELLOW}Showing logs for debugging:${NC}"
+    docker-compose logs
     exit 1
 fi
 
-# Step 2: Check if the application is running
-echo -e "\e[33mStep 2: Checking if the application is running...\e[0m"
-sleep 5  # Give the container a few seconds to start
-if curl -s -o /dev/null -w "%{http_code}" http://localhost:3006 | grep -q "200"; then
-    echo -e "\e[32m✓ Application is running successfully\e[0m"
-else
-    echo -e "\e[33m! Could not connect to the application. It might still be starting up.\e[0m"
-    echo -e "\e[33m  Try accessing http://localhost:3006 in your browser in a few moments.\e[0m"
+# Step 3: Wait for the application to be ready
+echo -e "${YELLOW}Step 3: Waiting for the application to be ready...${NC}"
+MAX_RETRIES=30
+RETRY_INTERVAL=2
+RETRY_COUNT=0
+SERVER_IP=$(hostname -I | awk '{print $1}')
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if curl -s -o /dev/null -w "%{http_code}" http://localhost:3006 | grep -q "200\|304"; then
+        echo -e "${GREEN}✓ Application is running successfully${NC}"
+        break
+    else
+        if [ $RETRY_COUNT -eq 0 ]; then
+            echo -e "${YELLOW}Waiting for application to start...${NC}"
+        else
+            echo -n "."
+        fi
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        sleep $RETRY_INTERVAL
+    fi
+
+    # If we've reached max retries, show an error
+    if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+        echo -e "\n${RED}✗ Application did not start properly within the expected time.${NC}"
+        echo -e "${YELLOW}Container logs:${NC}"
+        docker-compose logs
+        echo -e "\n${YELLOW}Troubleshooting steps:${NC}"
+        echo "1. Check if port 3006 is open in your firewall: sudo ufw allow 3006/tcp"
+        echo "2. Verify Docker container is running: docker ps"
+        echo "3. Check container logs: docker-compose logs"
+        exit 1
+    fi
+done
+
+# Check if the server has a public IP
+if [ -n "$SERVER_IP" ] && [ "$SERVER_IP" != "127.0.0.1" ]; then
+    # Try to access the application using the server's IP
+    if curl -s -o /dev/null -w "%{http_code}" http://$SERVER_IP:3006 | grep -q "200\|304"; then
+        echo -e "${GREEN}✓ Application is also accessible via server IP: http://$SERVER_IP:3006${NC}"
+    else
+        echo -e "${YELLOW}! Application may not be accessible via server IP: http://$SERVER_IP:3006${NC}"
+        echo -e "${YELLOW}  This could be due to firewall settings. Try: sudo ufw allow 3006/tcp${NC}"
+    fi
 fi
 
 echo ""
-echo -e "\e[32m✓ Setup completed successfully!\e[0m"
-echo -e "\e[36mYour application is now running on http://localhost:3006\e[0m"
-echo -e "\e[36m  (Docker container port 3000 is mapped to host port 3006)\e[0m"
+echo -e "${GREEN}✓ Setup completed successfully!${NC}"
+echo -e "${CYAN}Your application is now running on:${NC}"
+echo -e "${CYAN}  - Local: http://localhost:3006${NC}"
+if [ -n "$SERVER_IP" ] && [ "$SERVER_IP" != "127.0.0.1" ]; then
+    echo -e "${CYAN}  - Server IP: http://$SERVER_IP:3006${NC}"
+fi
+echo -e "${CYAN}  (Docker container port 3000 is mapped to host port 3006)${NC}"
 echo ""
-echo -e "\e[36mUseful Docker commands:\e[0m"
+echo -e "${CYAN}Useful Docker commands:${NC}"
 echo "- To view logs: docker-compose logs -f"
 echo "- To stop the application: docker-compose down"
-echo "- To restart the application: docker-compose restart" 
+echo "- To restart the application: docker-compose restart"
+echo ""
+echo -e "${YELLOW}IMPORTANT:${NC} If you cannot access the application via server IP, ensure port 3006 is open in your firewall:"
+echo "  sudo ufw allow 3006/tcp"
+echo "  sudo ufw status" 
