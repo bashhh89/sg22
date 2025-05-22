@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { pdfStyles } from './pdfStyles';
 import { renderMarkdownContentAsHtml } from './markdownRenderer';
 
-interface ScorecardPDFDocumentProps {
-  reportData: {
+export interface ScorecardPDFDocumentProps {
+  // Original props
+  reportData?: {
     reportId: string;
     reportMarkdown: string;
     questionAnswerHistory: Array<{
@@ -22,22 +23,58 @@ interface ScorecardPDFDocumentProps {
     tier?: string;
     finalScore?: number;
   };
+  // Props expected by PDFDownloadButton
+  data?: any;
+  onGenerateComplete?: (pdfBlob: Blob) => void;
+  onError?: (error: Error) => void;
 }
 
-export default function ScorecardPDFDocument({ reportData }: ScorecardPDFDocumentProps) {
+export default function ScorecardPDFDocument({ 
+  reportData, 
+  data, 
+  onGenerateComplete,
+  onError 
+}: ScorecardPDFDocumentProps) {
+  // Use data prop if reportData is not provided
+  const actualData = reportData || data;
+  
+  // Handle errors if the data is not in the expected format
+  useEffect(() => {
+    if (!actualData) {
+      if (onError) onError(new Error('No data provided for PDF generation'));
+      return;
+    }
+    
+    try {
+      // Simulate PDF generation (in a real app, this would use react-pdf or similar)
+      setTimeout(() => {
+        // Create a simple text blob as a placeholder for the PDF
+        const pdfContent = `AI Scorecard PDF Content for ${JSON.stringify(actualData)}`;
+        const blob = new Blob([pdfContent], { type: 'application/pdf' });
+        
+        if (onGenerateComplete) onGenerateComplete(blob);
+      }, 500);
+    } catch (error) {
+      if (onError) onError(error instanceof Error ? error : new Error('Failed to generate PDF'));
+    }
+  }, [actualData, onGenerateComplete, onError]);
+
+  // If no data is provided, don't render anything
+  if (!actualData) return null;
+
   const {
-    reportId,
-    reportMarkdown,
-    questionAnswerHistory,
-    leadName,
-    userName,
-    leadCompany,
-    companyName,
-    industry,
-    userAITier,
-    tier,
+    reportId = 'N/A',
+    reportMarkdown = '',
+    questionAnswerHistory = [],
+    leadName = '',
+    userName = '',
+    leadCompany = '',
+    companyName = '',
+    industry = '',
+    userAITier = '',
+    tier = '',
     finalScore,
-  } = reportData;
+  } = actualData;
 
   const displayName = leadName || userName || 'Valued User';
   const displayCompany = leadCompany || companyName || 'N/A';
