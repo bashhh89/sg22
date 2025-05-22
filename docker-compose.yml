@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3006:3006"
+      - "3006:3000"
     restart: always
     volumes:
       - ./logs:/app/logs

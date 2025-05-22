@@ -62,6 +62,7 @@ fi
 echo ""
 echo -e "\e[32m✓ Setup completed successfully!\e[0m"
 echo -e "\e[36mYour application is now running on http://localhost:3006\e[0m"
+echo -e "\e[36m  (Docker container port 3000 is mapped to host port 3006)\e[0m"
 echo ""
 echo -e "\e[36mUseful Docker commands:\e[0m"
 echo "- To view logs: docker-compose logs -f"

@@ -73,6 +73,7 @@ catch {
 Write-Host ""
 Write-Host "✓ Setup completed successfully!" -ForegroundColor Green
 Write-Host "Your application is now running on http://localhost:3006" -ForegroundColor Cyan
+Write-Host "  (Docker container port 3000 is mapped to host port 3006)" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Useful Docker commands:" -ForegroundColor Cyan
 Write-Host "- To view logs: docker-compose logs -f" -ForegroundColor White

@@ -24,8 +24,8 @@ RUN echo "Current directory structure:" && \
 # Build the application
 RUN pnpm build
 
-# Expose the port
-EXPOSE 3006
+# Expose the port (Next.js default is 3000)
+EXPOSE 3000
 
 # Start the application
 CMD ["pnpm", "start"] 
