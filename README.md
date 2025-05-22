@@ -1,51 +1,56 @@
-# AI Scorecard Application
+# AI Scorecard Application - Docker Version
 
-This application generates PDF scorecards for AI assessments.
+This application generates PDF scorecards for AI assessments. This version is containerized with Docker for easy deployment.
 
-## Setup Instructions
+## Quick Start with Docker
 
-### Simple Setup (Recommended)
-
-#### Windows:
-1. Open PowerShell in this directory
-2. Run the setup script:
-```powershell
-.\setup.ps1
-```
-
-#### Linux/Mac:
-1. Open Terminal in this directory
-2. Make the setup script executable:
-```bash
-chmod +x setup.sh
-```
+### Windows:
+1. Ensure Docker Desktop is installed and running
+2. Open PowerShell in this directory
 3. Run the setup script:
-```bash
-./setup.sh
+```powershell
+.\docker-setup.ps1
 ```
 
-### Manual Setup
-
-1. Install dependencies:
+### Linux/Mac:
+1. Ensure Docker and Docker Compose are installed and running
+2. Open Terminal in this directory
+3. Make the setup script executable:
 ```bash
-pnpm install
+chmod +x docker-setup.sh
+```
+4. Run the setup script:
+```bash
+./docker-setup.sh
 ```
 
-2. Build the application:
+That's it! The application will be running at http://localhost:3006
+
+## Manual Docker Setup
+
+If you prefer to run the Docker commands manually:
+
+1. Build and start the container:
 ```bash
-pnpm build
+docker-compose up -d --build
 ```
 
-3. Start the application:
+2. View logs:
 ```bash
-pnpm start
+docker-compose logs -f
 ```
 
-The application will run on http://localhost:3006
+3. Stop the container:
+```bash
+docker-compose down
+```
 
 ## System Requirements
-- Node.js 18 or higher
-- PNPM 8 or higher
+
+- Docker
+- Docker Compose
+
+No need to install Node.js or PNPM - everything runs inside the Docker container!
 
 ## Project Structure
 
@@ -55,8 +60,8 @@ The application will run on http://localhost:3006
   - `markdownRenderer.tsx` - Utility for rendering markdown in PDFs
   - `pdfStyles.ts` - Styling definitions for PDFs
 - `app/` - Next.js app router pages and API routes
-- `ecosystem.config.js` - PM2 configuration for production deployment
-- `scripts/` - Deployment and utility scripts
+- `Dockerfile` - Defines how the Docker image is built
+- `docker-compose.yml` - Configures the Docker container
 
 ## Getting Started
 

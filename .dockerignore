@@ -1,0 +1,31 @@
+# Node modules
+node_modules
+
+# .git directory
+.git
+
+# Build files
+.next
+
+# Logs
+logs
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Editor files
+.vscode
+.idea
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Other unnecessary files
+*.md
+LICENSE
+.DS_Store
+*.pdf 
