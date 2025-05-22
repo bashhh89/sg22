@@ -11,7 +11,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "node -e \"try { require('fs').writeFileSync('.env.local', require('fs').readFileSync('.env.local', 'utf-8')) } catch(e) { console.log('No .env.local file found, skipping postinstall step.') }\""
+    "postinstall": "node -e \"try { require('fs').writeFileSync('.env.local', require('fs').readFileSync('.env.local', 'utf-8')) } catch(e) { console.log('No .env.local file found, skipping postinstall step.') }\"",
+    "deploy:check": "node scripts/verify-deploy-readiness.js",
+    "deploy:setup": "node scripts/setup-deployment.js",
+    "deploy:start": "pm2 start ecosystem.config.js",
+    "deploy:restart": "pm2 reload aiscorecard",
+    "deploy:stop": "pm2 stop aiscorecard",
+    "deploy:logs": "pm2 logs aiscorecard",
+    "deploy:monitor": "pm2 monit"
   },
   "dependencies": {
     "@eslint/eslintrc": "^3.3.1",

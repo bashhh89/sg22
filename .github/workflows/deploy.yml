@@ -1,0 +1,44 @@
+name: Deploy AI Scorecard
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: '8.x'
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Build application
+      run: pnpm build
+      env:
+        # Add your environment variables here
+        NODE_ENV: production
+        
+    - name: Deploy
+      # Add your deployment steps here
+      # This could be deploying to a server, Vercel, etc.
+      run: |
+        echo "Deployment steps will go here"
+        # Example: rsync -a --delete .next/ user@your-server:/path/to/app/
+        
+    - name: Setup PM2
+      run: |
+        pnpm add -g pm2
+        pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js 
