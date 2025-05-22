@@ -1,6 +1,51 @@
-# SG Ready - AI Scorecard PDF Generation
+# AI Scorecard Application
 
-This repository contains the AI Scorecard application with PDF generation capabilities built with Next.js.
+This application generates PDF scorecards for AI assessments.
+
+## Setup Instructions
+
+### Simple Setup (Recommended)
+
+#### Windows:
+1. Open PowerShell in this directory
+2. Run the setup script:
+```powershell
+.\setup.ps1
+```
+
+#### Linux/Mac:
+1. Open Terminal in this directory
+2. Make the setup script executable:
+```bash
+chmod +x setup.sh
+```
+3. Run the setup script:
+```bash
+./setup.sh
+```
+
+### Manual Setup
+
+1. Install dependencies:
+```bash
+pnpm install
+```
+
+2. Build the application:
+```bash
+pnpm build
+```
+
+3. Start the application:
+```bash
+pnpm start
+```
+
+The application will run on http://localhost:3006
+
+## System Requirements
+- Node.js 18 or higher
+- PNPM 8 or higher
 
 ## Project Structure
 
